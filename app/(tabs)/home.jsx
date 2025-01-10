@@ -1,12 +1,71 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, FlatList, Image, RefreshControl } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { images } from '../../constants';
+import SearchInput from '../../components/SearchInput';
+import Trending from '../../components/Trending';
+import EmptyState from '../../components/EmptyState';
+import { getAllPosts, getLatestPosts } from '../../lib/appwrite';
+import useAppwrite from '../../lib/useAppwrite';
+import VideoCard from '../../components/VideoCard';
 
-const home = () => {
+const Home = () => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Fetch all posts for the video list
+  const { data: allPosts, isLoading: isLoadingAllPosts, fetchData } = useAppwrite(getAllPosts);
+
+  // Fetch latest posts for the trending section
+  const { data: latestPosts, isLoading: isLoadingLatestPosts } = useAppwrite(getLatestPosts);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
+
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-3xl">Welcome to Home</Text>
-    </View>
-  )
-}
+    <SafeAreaView className="bg-black-blackish flex-1 h-full">
+      <FlatList
+        data={allPosts}
+        keyExtractor={(item, index) => item.$id || item.id?.toString() || index.toString()}
+        renderItem={({ item }) => <VideoCard video={item} />}
+        ListHeaderComponent={() => (
+          <View className="my-6 px-4 space-y-6">
+            <View className="justify-between items-start flex-row mb-6">
+              <View>
+                <Text className="font-pmedium text-sm text-gray-100">Welcome Back</Text>
+                <Text className="text-2xl font-psemibold text-white">Salvador</Text>
+              </View>
+              <View className="mt-1.5">
+                <Image
+                  source={images.logoSmall}
+                  className="w-9 h-10"
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+            <SearchInput />
+            <View className="w-full flex-1 pt-5 pb-8">
+              <Text className="text-gray-100 text-lg font-pregular mb-3">Latest Videos</Text>
+              <Trending posts={latestPosts} />
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={() =>
+          isLoadingAllPosts ? (
+            <Text className="text-white text-center mt-4">Loading...</Text>
+          ) : (
+            <EmptyState
+              title="No videos found"
+              subtitle="Be the first to upload a video"
+            />
+          )
+        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      />
+    </SafeAreaView>
+  );
+};
 
-export default home
+export default Home;
