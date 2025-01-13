@@ -1,7 +1,7 @@
 <div align="center">
   <br />
     <a href="#" target="_blank">
-      <img src="assets/AI_VIDEO_SHARING_PLATFORM.png" alt="AI Video Sharing Platform Banner" style="border-radius: 20px;">
+      <img src="assets/AI VIDEO SHARING PLATFORM.png" alt="AI Video Sharing Platform Banner" style="border-radius: 20px;">
     </a>
   <br />
 
