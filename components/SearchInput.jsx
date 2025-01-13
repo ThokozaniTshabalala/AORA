@@ -1,10 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
 import { icons } from '../constants';
+import { usePathname, router } from 'expo-router';
 
-const SearchInput = ({ title, value, placeholder, handleChangeText, otherStyles, ...props }) => {
+const SearchInput = ({ value, placeholder, initialQuery }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const pathname = usePathname()
+  const [query, setQuery] = useState(initialQuery || '')
 
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
@@ -29,18 +31,27 @@ const SearchInput = ({ title, value, placeholder, handleChangeText, otherStyles,
       >
         <TextInput
           className="text-base mt-0.5 text-white flex-1 font-pregular"
-          value={value}
+          value={query}
           placeholder="Search for a video topic"
           onFocus={handleFocus}
           onBlur={handleBlur}
-          onChangeText={handleChangeText}
+          onChangeText={(e) => setQuery(e)}
           style={{ color: '#fff', flex: 1 }}
           placeholderTextColor="#b0b0b0"
-          secureTextEntry={title === 'Password' && !showPassword}
-          {...props}
+
         />
 
-       <TouchableOpacity>
+       <TouchableOpacity
+       onPress={() => {
+        if (!query) {
+          return Alert.alert('Missing query', "Please input something to search results across database");
+        }
+        if (pathname.startsWith('/search')) {
+          router.setParams({ query });  // Use query as a parameter
+        } else {
+          router.push(`/search/${query}`);  // Correct the interpolation for query
+        }
+      }}>
         <Image 
         source={icons.search}
         className='w-5 h-5'

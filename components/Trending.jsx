@@ -9,7 +9,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { Video } from 'expo-av'; // Import expo-video
 import { icons } from '../constants'; // Ensure your icons file is correctly set up
 
 // ErrorBoundary component to catch errors
@@ -32,26 +31,6 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// VideoComponent using expo-video
-const VideoComponent = ({ videoUrl }) => {
-  return (
-    <View style={styles.videoContainer}>
-      <Video
-        source={{ uri: videoUrl }}
-        resizeMode="cover" // Choose "contain" or "cover" based on your needs
-        style={styles.video}
-        shouldPlay // Automatically plays the video
-        isLooping // Loops the video
-        useNativeControls // Displays native controls for video playback
-        onLoadStart={() => console.log('Video loading started')}
-        onLoad={() => console.log('Video loaded')}
-        onError={(error) => console.error('Video load error:', error)}
-        onEnd={() => console.log('Video playback ended')}
-      />
-    </View>
-  );
-};
-
 const TrendingItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false);
   const isActive = activeItem === item.$id;
@@ -64,7 +43,7 @@ const TrendingItem = ({ activeItem, item }) => {
       ]}
     >
       {play ? (
-        <Text>Playing</Text>
+        <Text style={styles.playingText}>Playing</Text>
       ) : (
         <TouchableOpacity
           style={styles.touchable}
@@ -77,7 +56,9 @@ const TrendingItem = ({ activeItem, item }) => {
             }}
             style={[
               styles.imageBackground,
-              isActive ? styles.activeImageBackground : styles.inactiveImageBackground,
+              isActive
+                ? styles.activeImageBackground
+                : styles.inactiveImageBackground,
             ]}
             resizeMode="cover"
           />
@@ -168,13 +149,10 @@ const styles = StyleSheet.create({
     height: 48,
     position: 'absolute',
   },
-  videoContainer: {
-    width: '100%',
-    height: 200,
-  },
-  video: {
-    width: '100%',
-    height: '100%',
+  playingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
